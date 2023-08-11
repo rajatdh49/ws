@@ -1,14 +1,11 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
 
-function Signup(props) {
+function Login(props) {
   const navigate = useNavigate();
   const auth = getAuth();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState();
   const [remember, setRemeber] = useState(false);
@@ -16,42 +13,28 @@ function Signup(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const x = await createUserWithEmailAndPassword(auth, email, password);
-      if (x.user.uid !== undefined) {
-        console.log("hello");
-        addDoc(collection(db, `userData/${x.user.uid}/userDetails/`), {
-          name: name,
-        });
-        props.userHandler({ name: name, uid: x.user.uid });
-      }
+      const x = await signInWithEmailAndPassword(auth, email, password);
+      console.log(x);
       navigate("/plans");
+      props.userHandler({ uid: x.user.uid });
     } catch (err) {
       console.log(err);
     }
-    console.log("sign in");
+    console.log("log in");
   };
 
   return (
     <div className="h-screen bg-blue-900 flex items-center justify-center">
       <form
-        className="bg-white h-96 w-96 flex flex-col rounded-2xl items-center justify-center"
+        className="bg-white h-96 w-96 flex flex-col rounded-2xl"
         onSubmit={handleSubmit}
       >
         <div className="ml-auto mr-auto">
           <h1 className="font-bold tracking-wide mt-6 font-Poppins ">
-            Create Account
+            Login to your account
           </h1>
         </div>
         <div className="flex flex-col mt-5 w-72 ml-auto mr-auto ">
-          <label htmlFor="name" className="font-Poppins font-bold">
-            Name
-          </label>
-          <input
-            type="text"
-            className="mt-2 border rounded-sm h-8 p-2 outline-none "
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
           <label htmlFor="email" className="font-Poppins font-bold mt-2">
             Email
           </label>
@@ -79,16 +62,15 @@ function Signup(props) {
             Remember Me
           </span>
           <button className="border mt-1 font-Poppins font-medium p-1 bg-blue-900 text-white">
-            Sign Up
+            Login
           </button>
-          {/* <span className="text-sm ">Already have an account? </span> */}
         </div>
         <span className="text-sm text-center mt-3">
-          Already have an account? <Link to="/login">Login</Link>
+          New to My App? <Link to="/">Sign up</Link>
         </span>
       </form>
     </div>
   );
 }
 
-export default Signup;
+export default Login;
